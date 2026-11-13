@@ -7,7 +7,7 @@ edition = "2021"
 crate-type = ["cdylib", "staticlib", "rlib"]
 
 [dependencies]
-flutter_rust_bridge = "=2.12.0"
+flutter_rust_bridge = "=2.13.0"
 bwk-sp  = { git = "https://github.com/SatoshiPortal/bwk", rev = "46130f0345bfe3163aa0a021eb6907892dd5db06", package = "bwk-sp", features = ["sqlite"] }
 bwk     = { git = "https://github.com/SatoshiPortal/bwk", rev = "46130f0345bfe3163aa0a021eb6907892dd5db06", package = "bwk", features = ["sp"] }
 bwk-tx  = { git = "https://github.com/SatoshiPortal/bwk", rev = "46130f0345bfe3163aa0a021eb6907892dd5db06", package = "bwk-tx" }
