@@ -8,15 +8,16 @@ crate-type = ["cdylib", "staticlib", "rlib"]
 
 [dependencies]
 flutter_rust_bridge = "=2.12.0"
-bwk-sp  = { git = "https://github.com/bwk-bitcoin/bwk", rev = "7e531f74f04b7f99db0099d4a1ab5dd41e1b28f1", package = "bwk-sp", features = ["sqlite"] }
-bwk     = { git = "https://github.com/bwk-bitcoin/bwk", rev = "7e531f74f04b7f99db0099d4a1ab5dd41e1b28f1", package = "bwk", features = ["sp"] }
-bwk-tx  = { git = "https://github.com/bwk-bitcoin/bwk", rev = "7e531f74f04b7f99db0099d4a1ab5dd41e1b28f1", package = "bwk-tx" }
+bwk-sp  = { git = "https://github.com/SatoshiPortal/bwk", rev = "46130f0345bfe3163aa0a021eb6907892dd5db06", package = "bwk-sp", features = ["sqlite"] }
+bwk     = { git = "https://github.com/SatoshiPortal/bwk", rev = "46130f0345bfe3163aa0a021eb6907892dd5db06", package = "bwk", features = ["sp"] }
+bwk-tx  = { git = "https://github.com/SatoshiPortal/bwk", rev = "46130f0345bfe3163aa0a021eb6907892dd5db06", package = "bwk-tx" }
 bitcoin = { version = "0.32", features = ["serde"] }
 serde = { version = "1", features = ["derive"] }
 serde_json = "1"
 ureq = "2"
 log = "0.4"
 thiserror = "1"
+zeroize = "1"
 
 [dev-dependencies]
 tempfile = "3"

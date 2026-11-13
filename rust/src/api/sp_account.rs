@@ -301,6 +301,62 @@ impl SpAccount {
             PathBuf::from(&data_dir),
         );
 
+        config
+            .add_taproot_sub_account_from_mnemonic(&mnemonic)
+            .map_err(|e| format!("add taproot sub-account: {e}"))?;
+        Self::finish_create(
+            config,
+            electrum_url,
+            birthday_height,
+            dust_limit,
+            header_checkpoint,
+            scan_runtime,
+        )
+    }
+
+    #[allow(clippy::too_many_arguments)]
+    fn from_seed_with_runtime(
+        name: String,
+        network: SpNetwork,
+        seed: &[u8],
+        blindbit_url: String,
+        electrum_url: String,
+        data_dir: String,
+        birthday_height: Option<u32>,
+        dust_limit: Option<u64>,
+        header_checkpoint: Option<SpHeaderCheckpoint>,
+        scan_runtime: ScanRuntimeConfig,
+    ) -> Result<SpAccount, String> {
+        let mut config = SpConfig::from_seed(
+            name,
+            to_bitcoin_network(network),
+            seed,
+            blindbit_url,
+            PathBuf::from(&data_dir),
+        )
+        .map_err(|_| "invalid BIP39 seed length: expected 64 bytes".to_string())?;
+        config
+            .add_default_taproot_sub_account()
+            .map_err(|e| format!("add taproot sub-account: {e}"))?;
+        Self::finish_create(
+            config,
+            electrum_url,
+            birthday_height,
+            dust_limit,
+            header_checkpoint,
+            scan_runtime,
+        )
+    }
+
+    #[allow(clippy::too_many_arguments)]
+    fn finish_create(
+        mut config: SpConfig,
+        electrum_url: String,
+        birthday_height: Option<u32>,
+        dust_limit: Option<u64>,
+        header_checkpoint: Option<SpHeaderCheckpoint>,
+        scan_runtime: ScanRuntimeConfig,
+    ) -> Result<SpAccount, String> {
         config.birthday_height = birthday_height;
         config.dust_limit = dust_limit;
         config.header_checkpoint = header_checkpoint.map(parse_header_checkpoint).transpose()?;
@@ -310,10 +366,6 @@ impl SpAccount {
         if let Ok((Some(host), Some(port))) = parse_bwk_electrum_endpoint(&electrum_url) {
             config.set_electrum_endpoint(host, port);
         }
-
-        config
-            .add_taproot_sub_account_from_mnemonic(&mnemonic)
-            .map_err(|e| format!("add taproot sub-account: {e}"))?;
 
         let config = config.with_persistence(Some(bwk::persist::PersistenceKind::Sqlite));
         let account =
@@ -408,6 +460,68 @@ impl SpAccount {
             name,
             network,
             mnemonic,
+            blindbit_url,
+            electrum_url,
+            data_dir,
+            birthday_height,
+            dust_limit,
+            header_checkpoint,
+            scan_runtime,
+        )
+    }
+
+    /// Build a hot SP account from the 64 bytes of a BIP39 seed.
+    /// The mnemonic language and passphrase are already represented in the seed.
+    /// Recreate the account with the seed when reopening it: signer material is not persisted.
+    #[allow(clippy::too_many_arguments)]
+    pub fn create_from_seed(
+        name: String,
+        network: SpNetwork,
+        seed: Vec<u8>,
+        blindbit_url: String,
+        electrum_url: String,
+        data_dir: String,
+        birthday_height: Option<u32>,
+        dust_limit: Option<u64>,
+        header_checkpoint: Option<SpHeaderCheckpoint>,
+    ) -> Result<SpAccount, String> {
+        let seed = zeroize::Zeroizing::new(seed);
+        Self::from_seed_with_runtime(
+            name,
+            network,
+            &seed,
+            blindbit_url,
+            electrum_url,
+            data_dir,
+            birthday_height,
+            dust_limit,
+            header_checkpoint,
+            ScanRuntimeConfig::default(),
+        )
+    }
+
+    /// [create_from_seed] with an explicit scan runtime.
+    #[allow(clippy::too_many_arguments)]
+    pub fn create_from_seed_with_scan_runtime(
+        name: String,
+        network: SpNetwork,
+        seed: Vec<u8>,
+        blindbit_url: String,
+        electrum_url: String,
+        data_dir: String,
+        birthday_height: Option<u32>,
+        dust_limit: Option<u64>,
+        fetch_concurrency_factor: Option<u32>,
+        match_concurrency_factor: Option<u32>,
+        header_checkpoint: Option<SpHeaderCheckpoint>,
+    ) -> Result<SpAccount, String> {
+        let seed = zeroize::Zeroizing::new(seed);
+        let scan_runtime =
+            Self::runtime_from_factors(fetch_concurrency_factor, match_concurrency_factor)?;
+        Self::from_seed_with_runtime(
+            name,
+            network,
+            &seed,
             blindbit_url,
             electrum_url,
             data_dir,
