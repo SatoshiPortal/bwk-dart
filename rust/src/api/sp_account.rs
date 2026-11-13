@@ -1595,6 +1595,10 @@ mod tests {
         let from_seed = make_seed();
         let address = from_seed.sp_address().unwrap();
         assert_eq!(address, words.sp_address().unwrap());
+        assert_eq!(
+            derive_sp_address_from_seed(seed.to_vec(), SpNetwork::Regtest).unwrap(),
+            address
+        );
         let descriptor = |account: &SpAccount| {
             account.inner.lock().unwrap().get_config().descriptors[0]
                 .descriptor
@@ -1625,6 +1629,10 @@ mod tests {
     fn seed_rejects_invalid_lengths() {
         let dir = tempdir().unwrap();
         for length in [0, 63, 65] {
+            assert!(matches!(
+                derive_sp_address_from_seed(vec![0; length], SpNetwork::Regtest),
+                Err(ref error) if error == "invalid BIP39 seed length: expected 64 bytes"
+            ));
             let result = SpAccount::create_from_seed(
                 "invalid".into(),
                 SpNetwork::Regtest,
