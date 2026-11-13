@@ -1579,7 +1579,11 @@ mod tests {
         let seed_descriptor = descriptor(&from_seed);
         assert_eq!(seed_descriptor, descriptor(&words));
         let config = from_seed.inner.lock().unwrap().get_config();
-        let serialized = serde_json::to_string(&config).unwrap();
+        let config_path = seed_dir.path().join("persisted-config.json");
+        let store = FileConfigStore::<SpConfig>::new(config_path.clone());
+        store.save(&config.for_persistence()).unwrap();
+        let serialized = std::fs::read_to_string(config_path).unwrap();
+        assert!(store.load().unwrap().unwrap().seed.is_none());
         assert!(!serialized.contains(&hex::encode(seed)));
         assert!(!serde_json::from_str::<serde_json::Value>(&serialized)
             .unwrap()
