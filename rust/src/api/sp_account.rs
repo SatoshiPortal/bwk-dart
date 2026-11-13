@@ -1599,7 +1599,8 @@ mod tests {
             .as_object()
             .unwrap()
             .contains_key("seed"));
-        drop(from_seed);
+        futures_lite_block_on(from_seed.dispose()).unwrap();
+        from_seed.release();
         let reopened = make_seed();
         assert_eq!(reopened.sp_address().unwrap(), address);
         assert_eq!(descriptor(&reopened), seed_descriptor);
@@ -2586,6 +2587,8 @@ mod tests {
         )
         .expect("create");
 
+        let expected_address = acc.sp_address().unwrap();
+
         // Worker holds the inner lock for ~6s (longer than dispose's 5s
         // budget). It does NOT consult `scan_cancel` — that's the whole
         // point: this models `prepare_psbt`/`unified_history`/etc. which
@@ -2634,6 +2637,9 @@ mod tests {
         // Wait for the holder to finish so the test cleanly releases
         // the temporary directory.
         holder.join().expect("join");
+        assert_eq!(acc.sp_address().unwrap(), expected_address);
+        futures_lite_block_on(acc.dispose()).expect("retry disposal");
+        acc.release();
     }
 
     /// Minimal hand-rolled block_on for the async dispose/stop_scan
