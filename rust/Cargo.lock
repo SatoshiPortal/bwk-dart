@@ -274,7 +274,7 @@ checksum = "72f5acc6cb2ba439de613abc23857ec3d78374d8ed5ac84e9d11336e87da8649"
 [[package]]
 name = "bwk"
 version = "0.0.8"
-source = "git+https://github.com/bwk-bitcoin/bwk?rev=7e531f74f04b7f99db0099d4a1ab5dd41e1b28f1#7e531f74f04b7f99db0099d4a1ab5dd41e1b28f1"
+source = "git+https://github.com/SatoshiPortal/bwk?rev=46130f0345bfe3163aa0a021eb6907892dd5db06#46130f0345bfe3163aa0a021eb6907892dd5db06"
 dependencies = [
  "bip39",
  "bwk-backoff",
@@ -296,7 +296,7 @@ dependencies = [
 [[package]]
 name = "bwk-backoff"
 version = "0.0.3"
-source = "git+https://github.com/bwk-bitcoin/bwk?rev=7e531f74f04b7f99db0099d4a1ab5dd41e1b28f1#7e531f74f04b7f99db0099d4a1ab5dd41e1b28f1"
+source = "git+https://github.com/SatoshiPortal/bwk?rev=46130f0345bfe3163aa0a021eb6907892dd5db06#46130f0345bfe3163aa0a021eb6907892dd5db06"
 dependencies = [
  "rand 0.9.4",
 ]
@@ -304,7 +304,7 @@ dependencies = [
 [[package]]
 name = "bwk-coin"
 version = "0.0.1"
-source = "git+https://github.com/bwk-bitcoin/bwk?rev=7e531f74f04b7f99db0099d4a1ab5dd41e1b28f1#7e531f74f04b7f99db0099d4a1ab5dd41e1b28f1"
+source = "git+https://github.com/SatoshiPortal/bwk?rev=46130f0345bfe3163aa0a021eb6907892dd5db06#46130f0345bfe3163aa0a021eb6907892dd5db06"
 dependencies = [
  "bitcoin",
  "bwk-error",
@@ -315,7 +315,7 @@ dependencies = [
 [[package]]
 name = "bwk-descriptor"
 version = "0.0.1"
-source = "git+https://github.com/bwk-bitcoin/bwk?rev=7e531f74f04b7f99db0099d4a1ab5dd41e1b28f1#7e531f74f04b7f99db0099d4a1ab5dd41e1b28f1"
+source = "git+https://github.com/SatoshiPortal/bwk?rev=46130f0345bfe3163aa0a021eb6907892dd5db06#46130f0345bfe3163aa0a021eb6907892dd5db06"
 dependencies = [
  "bwk-error",
  "bwk-keys",
@@ -325,7 +325,7 @@ dependencies = [
 [[package]]
 name = "bwk-electrum"
 version = "0.0.4"
-source = "git+https://github.com/bwk-bitcoin/bwk?rev=7e531f74f04b7f99db0099d4a1ab5dd41e1b28f1#7e531f74f04b7f99db0099d4a1ab5dd41e1b28f1"
+source = "git+https://github.com/SatoshiPortal/bwk?rev=46130f0345bfe3163aa0a021eb6907892dd5db06#46130f0345bfe3163aa0a021eb6907892dd5db06"
 dependencies = [
  "bitcoin_slices",
  "bwk-backoff",
@@ -344,8 +344,8 @@ dependencies = [
 
 [[package]]
 name = "bwk-error"
-version = "0.0.1"
-source = "git+https://github.com/bwk-bitcoin/bwk?rev=7e531f74f04b7f99db0099d4a1ab5dd41e1b28f1#7e531f74f04b7f99db0099d4a1ab5dd41e1b28f1"
+version = "0.1.0"
+source = "git+https://github.com/SatoshiPortal/bwk?rev=46130f0345bfe3163aa0a021eb6907892dd5db06#46130f0345bfe3163aa0a021eb6907892dd5db06"
 dependencies = [
  "proc-macro2",
  "quote",
@@ -355,7 +355,7 @@ dependencies = [
 [[package]]
 name = "bwk-keys"
 version = "0.0.1"
-source = "git+https://github.com/bwk-bitcoin/bwk?rev=7e531f74f04b7f99db0099d4a1ab5dd41e1b28f1#7e531f74f04b7f99db0099d4a1ab5dd41e1b28f1"
+source = "git+https://github.com/SatoshiPortal/bwk?rev=46130f0345bfe3163aa0a021eb6907892dd5db06#46130f0345bfe3163aa0a021eb6907892dd5db06"
 dependencies = [
  "bip39",
  "bitcoin",
@@ -366,7 +366,7 @@ dependencies = [
 [[package]]
 name = "bwk-persist"
 version = "0.0.1"
-source = "git+https://github.com/bwk-bitcoin/bwk?rev=7e531f74f04b7f99db0099d4a1ab5dd41e1b28f1#7e531f74f04b7f99db0099d4a1ab5dd41e1b28f1"
+source = "git+https://github.com/SatoshiPortal/bwk?rev=46130f0345bfe3163aa0a021eb6907892dd5db06#46130f0345bfe3163aa0a021eb6907892dd5db06"
 dependencies = [
  "bwk-error",
  "fs2",
@@ -379,7 +379,7 @@ dependencies = [
 [[package]]
 name = "bwk-sign"
 version = "0.0.1"
-source = "git+https://github.com/bwk-bitcoin/bwk?rev=7e531f74f04b7f99db0099d4a1ab5dd41e1b28f1#7e531f74f04b7f99db0099d4a1ab5dd41e1b28f1"
+source = "git+https://github.com/SatoshiPortal/bwk?rev=46130f0345bfe3163aa0a021eb6907892dd5db06#46130f0345bfe3163aa0a021eb6907892dd5db06"
 dependencies = [
  "bip39",
  "bwk-descriptor",
@@ -396,7 +396,7 @@ dependencies = [
 [[package]]
 name = "bwk-sp"
 version = "0.1.0"
-source = "git+https://github.com/bwk-bitcoin/bwk?rev=7e531f74f04b7f99db0099d4a1ab5dd41e1b28f1#7e531f74f04b7f99db0099d4a1ab5dd41e1b28f1"
+source = "git+https://github.com/SatoshiPortal/bwk?rev=46130f0345bfe3163aa0a021eb6907892dd5db06#46130f0345bfe3163aa0a021eb6907892dd5db06"
 dependencies = [
  "bech32 0.9.1",
  "bimap",
@@ -419,12 +419,13 @@ dependencies = [
  "serde",
  "serde_json",
  "ureq 3.3.0",
+ "zeroize",
 ]
 
 [[package]]
 name = "bwk-tx"
 version = "0.0.1"
-source = "git+https://github.com/bwk-bitcoin/bwk?rev=7e531f74f04b7f99db0099d4a1ab5dd41e1b28f1#7e531f74f04b7f99db0099d4a1ab5dd41e1b28f1"
+source = "git+https://github.com/SatoshiPortal/bwk?rev=46130f0345bfe3163aa0a021eb6907892dd5db06#46130f0345bfe3163aa0a021eb6907892dd5db06"
 dependencies = [
  "bitcoin",
  "bwk-coin",
@@ -438,7 +439,7 @@ dependencies = [
 [[package]]
 name = "bwk-utils"
 version = "0.0.1"
-source = "git+https://github.com/bwk-bitcoin/bwk?rev=7e531f74f04b7f99db0099d4a1ab5dd41e1b28f1#7e531f74f04b7f99db0099d4a1ab5dd41e1b28f1"
+source = "git+https://github.com/SatoshiPortal/bwk?rev=46130f0345bfe3163aa0a021eb6907892dd5db06#46130f0345bfe3163aa0a021eb6907892dd5db06"
 dependencies = [
  "bitcoin",
  "log",
@@ -619,6 +620,7 @@ dependencies = [
  "thiserror",
  "ureq 2.12.1",
  "walkdir",
+ "zeroize",
 ]
 
 [[package]]
@@ -1890,7 +1892,7 @@ dependencies = [
 [[package]]
 name = "secp256k1_spscan-sys"
 version = "0.1.0"
-source = "git+https://github.com/bwk-bitcoin/bwk?rev=7e531f74f04b7f99db0099d4a1ab5dd41e1b28f1#7e531f74f04b7f99db0099d4a1ab5dd41e1b28f1"
+source = "git+https://github.com/SatoshiPortal/bwk?rev=46130f0345bfe3163aa0a021eb6907892dd5db06#46130f0345bfe3163aa0a021eb6907892dd5db06"
 dependencies = [
  "cc",
 ]
