@@ -33,6 +33,16 @@ config (`flutter_rust_bridge.yaml`, entrypoint `BwkCore`) exists only for buildi
 this crate in
 isolation.
 
+## Silent Payments from a BIP39 seed
+
+`SpAccount.createFromSeed` and `createFromSeedWithScanRuntime` accept the 64 bytes of a BIP39 seed. Derive that seed with the mnemonic's language and passphrase before calling the bridge. The seed selects both the BIP352 account and its default taproot sub-account; English words without a passphrase retain the mnemonic constructor's account.
+
+Recreate the account with the same seed and data directory when reopening it: signer material is not persisted. Before reopening, await `dispose()` and, only after it succeeds, await `release()` to consume the handle and release its resources. Do not reuse a released handle. If disposal fails, retain the handle and retry rather than reopening the account. The Rust bridge wipes its input copy on return; callers own their copies, and this does not guarantee erasure of every Dart or bridge allocation.
+
+`deriveSpAddressFromSeed` derives the public account-0 address without opening storage. A caller can verify the expected identity before opening existing account data; seed input remains inside the custody boundary.
+
+The aggregate SDK generates its Dart surface from this crate's Rust API. Standalone codegen remains a local build step; its generated files are not versioned in this repository.
+
 ## Invariant: scan is user-triggered only
 
 Silent Payments scanning never auto-starts. The rust-side checks live in 

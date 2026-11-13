@@ -139,6 +139,21 @@ fn sp_network_matches(
     }
 }
 
+/// Derive the public BIP352 account-0 address without opening account storage.
+/// The caller has already folded the mnemonic language and passphrase into the seed.
+pub fn derive_sp_address_from_seed(seed: Vec<u8>, network: SpNetwork) -> Result<String, String> {
+    let seed = zeroize::Zeroizing::new(seed);
+    let seed = bwk_sp::seed::Seed::from_slice(&seed)
+        .map_err(|_| "invalid BIP39 seed length: expected 64 bytes".to_string())?;
+    let receiver = bwk_sp::receiver::SpReceiver::new_from_seed(
+        &seed,
+        to_bitcoin_network(network),
+        bitcoin::bip32::ChildNumber::from_hardened_idx(0).expect("fixed BIP352 account"),
+    )
+    .map_err(|_| "SP address derivation failed".to_string())?;
+    Ok(receiver.get_receiving_address().to_string())
+}
+
 pub fn validate_recipient_address(
     address: String,
     network: SpNetwork,
@@ -301,6 +316,62 @@ impl SpAccount {
             PathBuf::from(&data_dir),
         );
 
+        config
+            .add_taproot_sub_account_from_mnemonic(&mnemonic)
+            .map_err(|e| format!("add taproot sub-account: {e}"))?;
+        Self::finish_create(
+            config,
+            electrum_url,
+            birthday_height,
+            dust_limit,
+            header_checkpoint,
+            scan_runtime,
+        )
+    }
+
+    #[allow(clippy::too_many_arguments)]
+    fn from_seed_with_runtime(
+        name: String,
+        network: SpNetwork,
+        seed: &[u8],
+        blindbit_url: String,
+        electrum_url: String,
+        data_dir: String,
+        birthday_height: Option<u32>,
+        dust_limit: Option<u64>,
+        header_checkpoint: Option<SpHeaderCheckpoint>,
+        scan_runtime: ScanRuntimeConfig,
+    ) -> Result<SpAccount, String> {
+        let mut config = SpConfig::from_seed(
+            name,
+            to_bitcoin_network(network),
+            seed,
+            blindbit_url,
+            PathBuf::from(&data_dir),
+        )
+        .map_err(|_| "invalid BIP39 seed length: expected 64 bytes".to_string())?;
+        config
+            .add_default_taproot_sub_account()
+            .map_err(|e| format!("add taproot sub-account: {e}"))?;
+        Self::finish_create(
+            config,
+            electrum_url,
+            birthday_height,
+            dust_limit,
+            header_checkpoint,
+            scan_runtime,
+        )
+    }
+
+    #[allow(clippy::too_many_arguments)]
+    fn finish_create(
+        mut config: SpConfig,
+        electrum_url: String,
+        birthday_height: Option<u32>,
+        dust_limit: Option<u64>,
+        header_checkpoint: Option<SpHeaderCheckpoint>,
+        scan_runtime: ScanRuntimeConfig,
+    ) -> Result<SpAccount, String> {
         config.birthday_height = birthday_height;
         config.dust_limit = dust_limit;
         config.header_checkpoint = header_checkpoint.map(parse_header_checkpoint).transpose()?;
@@ -310,10 +381,6 @@ impl SpAccount {
         if let Ok((Some(host), Some(port))) = parse_bwk_electrum_endpoint(&electrum_url) {
             config.set_electrum_endpoint(host, port);
         }
-
-        config
-            .add_taproot_sub_account_from_mnemonic(&mnemonic)
-            .map_err(|e| format!("add taproot sub-account: {e}"))?;
 
         let config = config.with_persistence(Some(bwk::persist::PersistenceKind::Sqlite));
         let account =
@@ -418,6 +485,77 @@ impl SpAccount {
         )
     }
 
+    /// Build a hot SP account from the 64 bytes of a BIP39 seed.
+    /// The mnemonic language and passphrase are already represented in the seed.
+    /// Recreate the account with the seed when reopening it: signer material is not persisted.
+    #[allow(clippy::too_many_arguments)]
+    pub fn create_from_seed(
+        name: String,
+        network: SpNetwork,
+        seed: Vec<u8>,
+        blindbit_url: String,
+        electrum_url: String,
+        data_dir: String,
+        birthday_height: Option<u32>,
+        dust_limit: Option<u64>,
+        header_checkpoint: Option<SpHeaderCheckpoint>,
+    ) -> Result<SpAccount, String> {
+        let seed = zeroize::Zeroizing::new(seed);
+        Self::from_seed_with_runtime(
+            name,
+            network,
+            &seed,
+            blindbit_url,
+            electrum_url,
+            data_dir,
+            birthday_height,
+            dust_limit,
+            header_checkpoint,
+            ScanRuntimeConfig::default(),
+        )
+    }
+
+    /// [create_from_seed] with an explicit scan runtime.
+    #[allow(clippy::too_many_arguments)]
+    pub fn create_from_seed_with_scan_runtime(
+        name: String,
+        network: SpNetwork,
+        seed: Vec<u8>,
+        blindbit_url: String,
+        electrum_url: String,
+        data_dir: String,
+        birthday_height: Option<u32>,
+        dust_limit: Option<u64>,
+        fetch_concurrency_factor: Option<u32>,
+        match_concurrency_factor: Option<u32>,
+        header_checkpoint: Option<SpHeaderCheckpoint>,
+    ) -> Result<SpAccount, String> {
+        let seed = zeroize::Zeroizing::new(seed);
+        let scan_runtime =
+            Self::runtime_from_factors(fetch_concurrency_factor, match_concurrency_factor)?;
+        Self::from_seed_with_runtime(
+            name,
+            network,
+            &seed,
+            blindbit_url,
+            electrum_url,
+            data_dir,
+            birthday_height,
+            dust_limit,
+            header_checkpoint,
+            scan_runtime,
+        )
+    }
+
+    /// Consume this account and release its resources after [dispose] succeeds.
+    /// Do not call this after a failed disposal: retain the handle and retry.
+    /// The handle cannot be used again after this call.
+    ///
+    /// Not `#[frb(sync)]`: dropping the account may block while resources close.
+    pub fn release(self) {
+        drop(self);
+    }
+
     /// Reopen an account already on disk.
     ///
     /// A given `header_checkpoint` replaces the one in the saved config, `None`
@@ -503,9 +641,9 @@ impl SpAccount {
         Ok(())
     }
 
-    /// Cooperatively stop the notification thread and release the inner
-    /// Account (and its sqlite handle). Safe to call multiple times; the
-    /// second call is a no-op.
+    /// Cooperatively stop the notification thread and wait for in-flight work.
+    /// Safe to call multiple times; the second call is a no-op. After success,
+    /// call [release] to consume the account and release its sqlite handle.
     ///
     /// Dart callers MUST invoke this before dropping the last reference to
     /// `SpAccount` (typically from `SpWalletEntity.dispose()` which is in
@@ -1416,6 +1554,100 @@ mod tests {
         let err = validate_recipient_address(address, SpNetwork::Testnet)
             .expect_err("wrong network must fail");
         assert!(err.contains("wrong network"));
+    }
+
+    #[test]
+    fn seed_matches_mnemonic_and_reopens_without_persisting_seed() {
+        use std::str::FromStr;
+        let seed = bwk_sp::receiver::bip39::Mnemonic::from_str(TEST_MNEMONIC)
+            .unwrap()
+            .to_seed("");
+        let words_dir = tempdir().unwrap();
+        let seed_dir = tempdir().unwrap();
+        let words = SpAccount::create_from_mnemonic(
+            "words".into(),
+            SpNetwork::Regtest,
+            TEST_MNEMONIC.into(),
+            "http://localhost:3000".into(),
+            String::new(),
+            words_dir.path().to_str().unwrap().into(),
+            None,
+            None,
+            None,
+        )
+        .unwrap();
+        let make_seed = || {
+            SpAccount::create_from_seed_with_scan_runtime(
+                "seed".into(),
+                SpNetwork::Regtest,
+                seed.to_vec(),
+                "http://localhost:3000".into(),
+                String::new(),
+                seed_dir.path().to_str().unwrap().into(),
+                None,
+                None,
+                None,
+                None,
+                None,
+            )
+            .unwrap()
+        };
+        let from_seed = make_seed();
+        let address = from_seed.sp_address().unwrap();
+        assert_eq!(address, words.sp_address().unwrap());
+        assert_eq!(
+            derive_sp_address_from_seed(seed.to_vec(), SpNetwork::Regtest).unwrap(),
+            address
+        );
+        let descriptor = |account: &SpAccount| {
+            account.inner.lock().unwrap().get_config().descriptors[0]
+                .descriptor
+                .to_string()
+        };
+        let seed_descriptor = descriptor(&from_seed);
+        assert_eq!(seed_descriptor, descriptor(&words));
+        let config = from_seed.inner.lock().unwrap().get_config();
+        let config_path = seed_dir.path().join("persisted-config.json");
+        let store = FileConfigStore::<SpConfig>::new(config_path.clone());
+        store.save(&config.for_persistence()).unwrap();
+        let serialized = std::fs::read_to_string(config_path).unwrap();
+        assert!(store.load().unwrap().unwrap().seed.is_none());
+        assert!(!serialized.contains(&hex::encode(seed)));
+        assert!(!serde_json::from_str::<serde_json::Value>(&serialized)
+            .unwrap()
+            .as_object()
+            .unwrap()
+            .contains_key("seed"));
+        futures_lite_block_on(from_seed.dispose()).unwrap();
+        from_seed.release();
+        let reopened = make_seed();
+        assert_eq!(reopened.sp_address().unwrap(), address);
+        assert_eq!(descriptor(&reopened), seed_descriptor);
+    }
+
+    #[test]
+    fn seed_rejects_invalid_lengths() {
+        let dir = tempdir().unwrap();
+        for length in [0, 63, 65] {
+            assert!(matches!(
+                derive_sp_address_from_seed(vec![0; length], SpNetwork::Regtest),
+                Err(ref error) if error == "invalid BIP39 seed length: expected 64 bytes"
+            ));
+            let result = SpAccount::create_from_seed(
+                "invalid".into(),
+                SpNetwork::Regtest,
+                vec![0; length],
+                "http://localhost:3000".into(),
+                String::new(),
+                dir.path().to_str().unwrap().into(),
+                None,
+                None,
+                None,
+            );
+            assert!(
+                matches!(result, Err(ref error) if error == "invalid BIP39 seed length: expected 64 bytes")
+            );
+        }
     }
 
     #[test]
@@ -2378,6 +2610,8 @@ mod tests {
         )
         .expect("create");
 
+        let expected_address = acc.sp_address().unwrap();
+
         // Worker holds the inner lock for ~6s (longer than dispose's 5s
         // budget). It does NOT consult `scan_cancel` — that's the whole
         // point: this models `prepare_psbt`/`unified_history`/etc. which
@@ -2426,6 +2660,9 @@ mod tests {
         // Wait for the holder to finish so the test cleanly releases
         // the temporary directory.
         holder.join().expect("join");
+        assert_eq!(acc.sp_address().unwrap(), expected_address);
+        futures_lite_block_on(acc.dispose()).expect("retry disposal");
+        acc.release();
     }
 
     /// Minimal hand-rolled block_on for the async dispose/stop_scan
