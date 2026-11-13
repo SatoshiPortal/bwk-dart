@@ -11,12 +11,12 @@ environment:
 dependencies:
   flutter:
       sdk: flutter
-  bwk: 
+  bwk_dart:
     path: ../
     # git:
     #   url: https://github.com/SatoshiPortal/bwk-dart.git
     #   ref: trunk
-  path_provider: ^2.1.2
+  material_ui: ^1.11.0
 
 dev_dependencies:
   flutter_test:

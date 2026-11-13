@@ -41,7 +41,7 @@ Recreate the account with the same seed and data directory when reopening it: si
 
 `deriveSpAddressFromSeed` derives the public account-0 address without opening storage. A caller can verify the expected identity before opening existing account data; seed input remains inside the custody boundary.
 
-The aggregate SDK generates its Dart surface from this crate's Rust API. Standalone codegen remains a local build step; its generated files are not versioned in this repository.
+The aggregate SDK generates its Dart surface from this crate's Rust API. Standalone Dart and Rust bridge sources are versioned so Git consumers can build without running code generation inside their dependency cache. Regenerate them with flutter_rust_bridge_codegen 2.13.0 when the Rust API changes.
 
 ## Invariant: scan is user-triggered only
 
@@ -58,6 +58,8 @@ cargo feature is guarded by a `compile_error!`.
 - `scripts/audit-sp-invariant.sh` — rust-side no-autoscan audit.
 
 ## Build (standalone)
+
+Flutter 3.50 / Dart 3.14 or later builds the Rust library through `hook/build.dart` and Native Assets. Android, Apple and desktop consumers no longer run CargoKit or download precompiled native binaries. Call `LibBwk.init()` to initialize the generated bridge using the registered Native Assets code asset. Apple packaging still requires verification with a full Xcode build.
 
 ```bash
 cd rust

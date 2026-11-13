@@ -1,2 +1,0 @@
-TAG_VERSION=0.1.5
-REPOSITORY_URL=https://github.com/SatoshiPortal/bwk-dart/releases/download
