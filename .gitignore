@@ -32,8 +32,6 @@ test/libdart_bwk.so
 # FVM Version Cache
 .fvm/
 
-# Standalone FRB outputs are generated locally; bull_sdk owns aggregate bindings.
-/lib/src/generated/
-/rust/src/frb_generated.rs
+# Legacy generated C headers are unnecessary with Native Assets.
 /ios/Classes/frb_generated.h
 /macos/Classes/frb_generated.h
