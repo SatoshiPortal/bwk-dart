@@ -139,6 +139,21 @@ fn sp_network_matches(
     }
 }
 
+/// Derive the public BIP352 account-0 address without opening account storage.
+/// The caller has already folded the mnemonic language and passphrase into the seed.
+pub fn derive_sp_address_from_seed(seed: Vec<u8>, network: SpNetwork) -> Result<String, String> {
+    let seed = zeroize::Zeroizing::new(seed);
+    let seed = bwk_sp::seed::Seed::from_slice(&seed)
+        .map_err(|_| "invalid BIP39 seed length: expected 64 bytes".to_string())?;
+    let receiver = bwk_sp::receiver::SpReceiver::new_from_seed(
+        &seed,
+        to_bitcoin_network(network),
+        bitcoin::bip32::ChildNumber::from_hardened_idx(0).expect("fixed BIP352 account"),
+    )
+    .map_err(|_| "SP address derivation failed".to_string())?;
+    Ok(receiver.get_receiving_address().to_string())
+}
+
 pub fn validate_recipient_address(
     address: String,
     network: SpNetwork,

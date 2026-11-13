@@ -39,6 +39,8 @@ isolation.
 
 Recreate the account with the same seed and data directory when reopening it: signer material is not persisted. Before reopening, await `dispose()` and, only after it succeeds, await `release()` to consume the handle and release its resources. Do not reuse a released handle. If disposal fails, retain the handle and retry rather than reopening the account. The Rust bridge wipes its input copy on return; callers own their copies, and this does not guarantee erasure of every Dart or bridge allocation.
 
+`deriveSpAddressFromSeed` derives the public account-0 address without opening storage. A caller can verify the expected identity before opening existing account data; seed input remains inside the custody boundary.
+
 The aggregate SDK generates its Dart surface from this crate's Rust API. Standalone codegen remains a local build step; its generated files are not versioned in this repository.
 
 ## Invariant: scan is user-triggered only
