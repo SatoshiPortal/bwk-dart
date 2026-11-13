@@ -1533,6 +1533,87 @@ mod tests {
     }
 
     #[test]
+    fn seed_matches_mnemonic_and_reopens_without_persisting_seed() {
+        use std::str::FromStr;
+        let seed = bwk_sp::receiver::bip39::Mnemonic::from_str(TEST_MNEMONIC)
+            .unwrap()
+            .to_seed("");
+        let words_dir = tempdir().unwrap();
+        let seed_dir = tempdir().unwrap();
+        let words = SpAccount::create_from_mnemonic(
+            "words".into(),
+            SpNetwork::Regtest,
+            TEST_MNEMONIC.into(),
+            "http://localhost:3000".into(),
+            String::new(),
+            words_dir.path().to_str().unwrap().into(),
+            None,
+            None,
+            None,
+        )
+        .unwrap();
+        let make_seed = || {
+            SpAccount::create_from_seed_with_scan_runtime(
+                "seed".into(),
+                SpNetwork::Regtest,
+                seed.to_vec(),
+                "http://localhost:3000".into(),
+                String::new(),
+                seed_dir.path().to_str().unwrap().into(),
+                None,
+                None,
+                None,
+                None,
+                None,
+            )
+            .unwrap()
+        };
+        let from_seed = make_seed();
+        let address = from_seed.sp_address().unwrap();
+        assert_eq!(address, words.sp_address().unwrap());
+        let descriptor = |account: &SpAccount| {
+            account.inner.lock().unwrap().get_config().descriptors[0]
+                .descriptor
+                .to_string()
+        };
+        let seed_descriptor = descriptor(&from_seed);
+        assert_eq!(seed_descriptor, descriptor(&words));
+        let config = from_seed.inner.lock().unwrap().get_config();
+        let serialized = serde_json::to_string(&config).unwrap();
+        assert!(!serialized.contains(&hex::encode(seed)));
+        assert!(!serde_json::from_str::<serde_json::Value>(&serialized)
+            .unwrap()
+            .as_object()
+            .unwrap()
+            .contains_key("seed"));
+        drop(from_seed);
+        let reopened = make_seed();
+        assert_eq!(reopened.sp_address().unwrap(), address);
+        assert_eq!(descriptor(&reopened), seed_descriptor);
+    }
+
+    #[test]
+    fn seed_rejects_invalid_lengths() {
+        let dir = tempdir().unwrap();
+        for length in [0, 63, 65] {
+            let result = SpAccount::create_from_seed(
+                "invalid".into(),
+                SpNetwork::Regtest,
+                vec![0; length],
+                "http://localhost:3000".into(),
+                String::new(),
+                dir.path().to_str().unwrap().into(),
+                None,
+                None,
+                None,
+            );
+            assert!(
+                matches!(result, Err(ref error) if error == "invalid BIP39 seed length: expected 64 bytes")
+            );
+        }
+    }
+
+    #[test]
     fn sp_account_create_load() {
         let dir = tempdir().unwrap();
         let data_dir = dir.path().to_str().unwrap().to_string();
