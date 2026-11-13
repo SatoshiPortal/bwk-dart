@@ -532,6 +532,15 @@ impl SpAccount {
         )
     }
 
+    /// Consume this account and release its resources after [dispose] succeeds.
+    /// Do not call this after a failed disposal: retain the handle and retry.
+    /// The handle cannot be used again after this call.
+    ///
+    /// Not `#[frb(sync)]`: dropping the account may block while resources close.
+    pub fn release(self) {
+        drop(self);
+    }
+
     /// Reopen an account already on disk.
     ///
     /// A given `header_checkpoint` replaces the one in the saved config, `None`
@@ -617,9 +626,9 @@ impl SpAccount {
         Ok(())
     }
 
-    /// Cooperatively stop the notification thread and release the inner
-    /// Account (and its sqlite handle). Safe to call multiple times; the
-    /// second call is a no-op.
+    /// Cooperatively stop the notification thread and wait for in-flight work.
+    /// Safe to call multiple times; the second call is a no-op. After success,
+    /// call [release] to consume the account and release its sqlite handle.
     ///
     /// Dart callers MUST invoke this before dropping the last reference to
     /// `SpAccount` (typically from `SpWalletEntity.dispose()` which is in
