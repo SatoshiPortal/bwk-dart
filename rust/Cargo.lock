@@ -267,7 +267,7 @@ checksum = "87a0cf66fd1eb2fb7b822cb78370d82303750809bc6ba855f3f58e517d3238db"
 [[package]]
 name = "bwk"
 version = "0.0.8"
-source = "git+https://github.com/ethicnology-agent/bwk?rev=1f183d480d6a860409ef20b1663c6af737f59894#1f183d480d6a860409ef20b1663c6af737f59894"
+source = "git+https://github.com/SatoshiPortal/bwk?rev=a1d8ce26efa5b252e818c2be16d879dd7014e191#a1d8ce26efa5b252e818c2be16d879dd7014e191"
 dependencies = [
  "bip39",
  "bwk-backoff",
@@ -289,7 +289,7 @@ dependencies = [
 [[package]]
 name = "bwk-backoff"
 version = "0.0.3"
-source = "git+https://github.com/ethicnology-agent/bwk?rev=1f183d480d6a860409ef20b1663c6af737f59894#1f183d480d6a860409ef20b1663c6af737f59894"
+source = "git+https://github.com/SatoshiPortal/bwk?rev=a1d8ce26efa5b252e818c2be16d879dd7014e191#a1d8ce26efa5b252e818c2be16d879dd7014e191"
 dependencies = [
  "rand 0.9.5",
 ]
@@ -297,7 +297,7 @@ dependencies = [
 [[package]]
 name = "bwk-coin"
 version = "0.0.1"
-source = "git+https://github.com/ethicnology-agent/bwk?rev=1f183d480d6a860409ef20b1663c6af737f59894#1f183d480d6a860409ef20b1663c6af737f59894"
+source = "git+https://github.com/SatoshiPortal/bwk?rev=a1d8ce26efa5b252e818c2be16d879dd7014e191#a1d8ce26efa5b252e818c2be16d879dd7014e191"
 dependencies = [
  "bitcoin",
  "bwk-error",
@@ -308,7 +308,7 @@ dependencies = [
 [[package]]
 name = "bwk-descriptor"
 version = "0.0.1"
-source = "git+https://github.com/ethicnology-agent/bwk?rev=1f183d480d6a860409ef20b1663c6af737f59894#1f183d480d6a860409ef20b1663c6af737f59894"
+source = "git+https://github.com/SatoshiPortal/bwk?rev=a1d8ce26efa5b252e818c2be16d879dd7014e191#a1d8ce26efa5b252e818c2be16d879dd7014e191"
 dependencies = [
  "bwk-error",
  "bwk-keys",
@@ -318,7 +318,7 @@ dependencies = [
 [[package]]
 name = "bwk-electrum"
 version = "0.0.4"
-source = "git+https://github.com/ethicnology-agent/bwk?rev=1f183d480d6a860409ef20b1663c6af737f59894#1f183d480d6a860409ef20b1663c6af737f59894"
+source = "git+https://github.com/SatoshiPortal/bwk?rev=a1d8ce26efa5b252e818c2be16d879dd7014e191#a1d8ce26efa5b252e818c2be16d879dd7014e191"
 dependencies = [
  "bitcoin_slices",
  "bwk-backoff",
@@ -338,7 +338,7 @@ dependencies = [
 [[package]]
 name = "bwk-error"
 version = "0.1.0"
-source = "git+https://github.com/ethicnology-agent/bwk?rev=1f183d480d6a860409ef20b1663c6af737f59894#1f183d480d6a860409ef20b1663c6af737f59894"
+source = "git+https://github.com/SatoshiPortal/bwk?rev=a1d8ce26efa5b252e818c2be16d879dd7014e191#a1d8ce26efa5b252e818c2be16d879dd7014e191"
 dependencies = [
  "proc-macro2",
  "quote",
@@ -348,7 +348,7 @@ dependencies = [
 [[package]]
 name = "bwk-keys"
 version = "0.0.1"
-source = "git+https://github.com/ethicnology-agent/bwk?rev=1f183d480d6a860409ef20b1663c6af737f59894#1f183d480d6a860409ef20b1663c6af737f59894"
+source = "git+https://github.com/SatoshiPortal/bwk?rev=a1d8ce26efa5b252e818c2be16d879dd7014e191#a1d8ce26efa5b252e818c2be16d879dd7014e191"
 dependencies = [
  "bip39",
  "bitcoin",
@@ -359,7 +359,7 @@ dependencies = [
 [[package]]
 name = "bwk-persist"
 version = "0.0.1"
-source = "git+https://github.com/ethicnology-agent/bwk?rev=1f183d480d6a860409ef20b1663c6af737f59894#1f183d480d6a860409ef20b1663c6af737f59894"
+source = "git+https://github.com/SatoshiPortal/bwk?rev=a1d8ce26efa5b252e818c2be16d879dd7014e191#a1d8ce26efa5b252e818c2be16d879dd7014e191"
 dependencies = [
  "bwk-error",
  "fs2",
@@ -372,7 +372,7 @@ dependencies = [
 [[package]]
 name = "bwk-sign"
 version = "0.0.1"
-source = "git+https://github.com/ethicnology-agent/bwk?rev=1f183d480d6a860409ef20b1663c6af737f59894#1f183d480d6a860409ef20b1663c6af737f59894"
+source = "git+https://github.com/SatoshiPortal/bwk?rev=a1d8ce26efa5b252e818c2be16d879dd7014e191#a1d8ce26efa5b252e818c2be16d879dd7014e191"
 dependencies = [
  "bip39",
  "bwk-descriptor",
@@ -389,7 +389,7 @@ dependencies = [
 [[package]]
 name = "bwk-sp"
 version = "0.1.0"
-source = "git+https://github.com/ethicnology-agent/bwk?rev=1f183d480d6a860409ef20b1663c6af737f59894#1f183d480d6a860409ef20b1663c6af737f59894"
+source = "git+https://github.com/SatoshiPortal/bwk?rev=a1d8ce26efa5b252e818c2be16d879dd7014e191#a1d8ce26efa5b252e818c2be16d879dd7014e191"
 dependencies = [
  "bech32 0.9.1",
  "bimap",
@@ -418,7 +418,7 @@ dependencies = [
 [[package]]
 name = "bwk-tx"
 version = "0.0.1"
-source = "git+https://github.com/ethicnology-agent/bwk?rev=1f183d480d6a860409ef20b1663c6af737f59894#1f183d480d6a860409ef20b1663c6af737f59894"
+source = "git+https://github.com/SatoshiPortal/bwk?rev=a1d8ce26efa5b252e818c2be16d879dd7014e191#a1d8ce26efa5b252e818c2be16d879dd7014e191"
 dependencies = [
  "bitcoin",
  "bwk-coin",
@@ -432,7 +432,7 @@ dependencies = [
 [[package]]
 name = "bwk-utils"
 version = "0.0.1"
-source = "git+https://github.com/ethicnology-agent/bwk?rev=1f183d480d6a860409ef20b1663c6af737f59894#1f183d480d6a860409ef20b1663c6af737f59894"
+source = "git+https://github.com/SatoshiPortal/bwk?rev=a1d8ce26efa5b252e818c2be16d879dd7014e191#a1d8ce26efa5b252e818c2be16d879dd7014e191"
 dependencies = [
  "bitcoin",
  "log",
@@ -1921,7 +1921,7 @@ dependencies = [
 [[package]]
 name = "secp256k1_spscan-sys"
 version = "0.1.0"
-source = "git+https://github.com/ethicnology-agent/bwk?rev=1f183d480d6a860409ef20b1663c6af737f59894#1f183d480d6a860409ef20b1663c6af737f59894"
+source = "git+https://github.com/SatoshiPortal/bwk?rev=a1d8ce26efa5b252e818c2be16d879dd7014e191#a1d8ce26efa5b252e818c2be16d879dd7014e191"
 dependencies = [
  "cc",
 ]
